@@ -1,11 +1,24 @@
 import Vue from 'vue'
 import App from './App.vue'
-import router from './router'
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
+
+// 导入路由
+import router from './router/index.js'
+
+// 导入 element-ui
+import ElementUI from 'element-ui'
+// 导入 element-ui的样式
+import 'element-ui/lib/theme-chalk/index.css'
+// 注册element-ui
+Vue.use(ElementUI)
+
+// 导入全局样式
+import './style/base.css'
+
 Vue.config.productionTip = false
-Vue.use(ElementUI);
+
+
 new Vue({
-  router,
   render: h => h(App),
+  // 挂载到Vue示例上  路由
+  router
 }).$mount('#app')
