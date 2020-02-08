@@ -33,18 +33,22 @@
               ></el-input>
             </el-col>
             <el-col :span="7">
-              <img class="logincode" src="../../assets/login_captcha.png" alt="">
+              <img class="logincode" src="../../assets/login_captcha.png" alt />
             </el-col>
           </el-row>
         </el-form-item>
         <!-- 用户协议 -->
         <el-form-item>
-          <el-checkbox v-model="loginform.isChecked">是否同意用户协议</el-checkbox>
+          <el-checkbox v-model="loginform.isChecked">
+            我已阅读并同意
+            <el-link type="primary">用户协议</el-link>和
+            <el-link type="primary">隐私条款</el-link>
+          </el-checkbox>
         </el-form-item>
         <!-- 登录按钮 -->
         <el-form-item>
-          <el-button type="primary">登录</el-button>
-          <el-button>取消</el-button>
+          <el-button class="loginbtn" type="primary">登录</el-button>
+          <el-button class="loginbtn" type="primary">注册</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -82,6 +86,7 @@ export default {
   align-items: center;
   /* 左右均分 */
   justify-content: space-around;
+  // 左侧盒子
   .left-box {
     width: 478px;
     background-color: #f5f5f5;
@@ -116,9 +121,22 @@ export default {
         color: rgba(12, 12, 12, 1);
       }
     }
-    .logincode{
-      height:40.8px;
-      width:100%;
+    .logincode {
+      height: 40.8px;
+      width: 100%;
+    }
+    .loginbtn{
+      width: 100%;
+      margin-bottom: 26px;
+      margin-left: 0;
+    }
+  }
+  // 协议布局
+  .el-checkbox {
+    display: flex;
+    align-items: center;
+    .el-checkbox__label {
+      display: flex;
     }
   }
 }
