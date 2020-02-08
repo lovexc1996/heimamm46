@@ -24,7 +24,18 @@
         </el-form-item>
         <!-- 验证码 -->
         <el-form-item>
-          <el-input placeholder="请输入验证码" prefix-icon="el-icon-key" v-model="loginform.logincode"></el-input>
+          <el-row>
+            <el-col :span="17">
+              <el-input
+                placeholder="请输入验证码"
+                prefix-icon="el-icon-key"
+                v-model="loginform.logincode"
+              ></el-input>
+            </el-col>
+            <el-col :span="7">
+              <img class="logincode" src="../../assets/login_captcha.png" alt="">
+            </el-col>
+          </el-row>
         </el-form-item>
         <!-- 用户协议 -->
         <el-form-item>
@@ -84,8 +95,6 @@ export default {
       margin-top: 44px;
       margin-left: 48px;
       margin-bottom: 27px;
-      .logo {
-      }
       .title {
         font-size: 24px;
         margin-left: 16px;
@@ -106,6 +115,10 @@ export default {
         font-weight: 400;
         color: rgba(12, 12, 12, 1);
       }
+    }
+    .logincode{
+      height:40.8px;
+      width:100%;
     }
   }
 }
