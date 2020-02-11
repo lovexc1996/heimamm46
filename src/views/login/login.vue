@@ -10,7 +10,7 @@
       </div>
       <el-form ref="loginform" :rules="rules" :model="loginform" label-width="43px">
         <!-- 手机号 -->
-        <el-form-item>
+        <el-form-item prop="phone">
           <el-input placeholder="请输入手机号" prefix-icon="el-icon-user" v-model="loginform.phone"></el-input>
         </el-form-item>
         <!-- 密码 -->
@@ -33,7 +33,8 @@
               ></el-input>
             </el-col>
             <el-col :span="7">
-              <img class="logincode" src="../../assets/login_captcha.png" alt />
+              <!-- 登录验证码 -->
+              <img class="logincode" @click="changCode" :src="codeURL" alt />
             </el-col>
           </el-row>
         </el-form-item>
@@ -61,8 +62,13 @@
 <script>
 // 导入 注册对话框组件
 import registerDialog from "./components/registerDialog.vue";
-// 测试基地址配置
-window.console.log(process.env.VUE_APP_URL)
+// 定义校验函数 - 手机
+import { checkPhone } from "@/utils/validator.js";
+// 导入登录接口
+import { login } from "@/api/login.js";
+// 导入token的工具函数
+import {setToken} from "@/utils/token.js"
+
 export default {
   //组件的名字
   name: "login",
@@ -84,6 +90,14 @@ export default {
       },
       // 校验规则
       rules: {
+        phone: [
+          {
+            required: true,
+            message: "手机号不能为空",
+            trigger: "blur"
+          },
+          { validator: checkPhone, trigger: "change" }
+        ],
         password: [
           {
             required: true,
@@ -100,7 +114,9 @@ export default {
           },
           { min: 4, max: 4, message: "验证码的长度为4位", trigger: "blur" }
         ]
-      }
+      },
+      // 验证码地址
+      codeURL: process.env.VUE_APP_URL + "/captcha?type=login"
     };
   },
   // 方法
@@ -112,8 +128,30 @@ export default {
       // validate这个方法是Element-ui的表单的方法
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$message.success("验证成功");
           // 验证正确
+          // 验证是否勾选
+          if (this.loginform.isChecked != true) {
+            return this.$message.warning("请勾选用户协议");
+          }
+          // 验证通过
+          login({
+            phone: this.loginform.phone,
+            password: this.loginform.password,
+            code: this.loginform.logincode
+          }).then(res => {
+            // 正确
+            if (res.data.code === 200) {
+              this.$message.success("欢迎你");
+              // 服务器返回了token
+              // token保存到哪里?localStorage(一直在)SessionStorage(刷新就消失)
+              // window.localStorage.setItem("heimammToken", res.data.data.token);
+              setToken(res.data.data.token);
+              // 跳转到首页
+              this.$router.push("/index");
+            } else if (res.data.code === 202) {
+              this.$message.error(res.data.message);
+            }
+          });
         } else {
           this.$message.error("验证失败");
           // 验证错误
@@ -127,6 +165,11 @@ export default {
       // registerDialog 和上面设置的属性要一致
       // 也可以用 this.$refs['registerDialog']
       this.$refs.registerDialog.dialogFormVisible = true;
+    },
+    // 刷新验证码方法
+    changCode() {
+      this.codeURL =
+        process.env.VUE_APP_URL + "/captcha?type=login&t=" + Date.now();
     }
   }
 };
