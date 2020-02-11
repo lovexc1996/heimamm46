@@ -7,7 +7,7 @@
     :visible.sync="dialogFormVisible"
   >
     <el-form :model="form" :rules="rules" ref="registerForm">
-      <el-form-item label="头像">
+      <el-form-item label="头像" prop="avatar">
         <el-upload
           class="avatar-uploader"
           :action="uploadUrl"
@@ -70,7 +70,7 @@
 // 导入axios
 // import axios from "axios";
 // 导入 接口
-import { sendsms } from "../../../api/register.js";
+import { sendsms } from "@/api/register.js";
 
 // 定义校验函数 - 手机
 const checkPhone = (rule, value, callback) => {
@@ -112,9 +112,14 @@ export default {
         // 邮箱
         email: "",
         // 图片验证码
-        code: ""
+        code: "",
+        // 用户的头像地址
+        avatar: ""
       },
       rules: {
+        avatar: [
+          { required: true, message: "用户头像能为空", trigger: "blur" }
+        ],
         username: [
           { required: true, message: "用户名不能为空", trigger: "blur" },
           { min: 6, max: 12, message: "用户名的长度为6-12位", trigger: "blur" }
@@ -151,10 +156,12 @@ export default {
       window.console.log(res);
       // URL.createObjectURL 生成的是本地的临时路径，刷新就没用了
       this.imageUrl = URL.createObjectURL(file.raw);
+      // 保存 服务器返回的图片地址
+      this.from.avatar = res.data.file_path;
     },
     // 上传之前
     beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg" || "image/png";
+      const isJPG = file.type === "image/jpeg" || "image/png" || "image/gif";
       // 1024*1024 1mb
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isJPG) {
