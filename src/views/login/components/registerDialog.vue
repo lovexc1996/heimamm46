@@ -34,17 +34,17 @@
       <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
         <el-input show-password v-model="form.password" autocomplete="off"></el-input>
       </el-form-item>
-      <el-form-item label="图形码" :label-width="formLabelWidth">
+      <el-form-item label="图形码" prop="code" :label-width="formLabelWidth">
         <el-row>
           <el-col :span="16">
-            <el-input v-model="form.code" autocomplete="off"></el-input>
+            <el-input v-model="form.rcode" autocomplete="off"></el-input>
           </el-col>
           <el-col :span="7" :offset="1" class="register-box">
             <img class="register-code" @click="changCode" :src="codeURL" alt />
           </el-col>
         </el-row>
       </el-form-item>
-      <el-form-item label="验证码" :label-width="formLabelWidth">
+      <el-form-item label="验证码" prop="rcode" :label-width="formLabelWidth">
         <el-row>
           <el-col :span="16">
             <el-input v-model="form.name" autocomplete="off"></el-input>
@@ -61,7 +61,7 @@
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="dialogFormVisible = false">取 消</el-button>
-      <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      <el-button type="primary" @click="submitForm(registerForm)">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -70,7 +70,7 @@
 // 导入axios
 // import axios from "axios";
 // 导入 接口
-import { sendsms } from "@/api/register.js";
+import { sendsms,register } from "@/api/register.js";
 
 // 定义校验函数 - 手机
 const checkPhone = (rule, value, callback) => {
@@ -114,7 +114,9 @@ export default {
         // 图片验证码
         code: "",
         // 用户的头像地址
-        avatar: ""
+        avatar: "",
+        // 增加短信验证码
+        rcode:""
       },
       rules: {
         avatar: [
@@ -158,6 +160,8 @@ export default {
       this.imageUrl = URL.createObjectURL(file.raw);
       // 保存 服务器返回的图片地址
       this.from.avatar = res.data.file_path;
+      // 表单中 头像字段的校验
+      this.$refs.registerForm.validateField('avatar')
     },
     // 上传之前
     beforeAvatarUpload(file) {
@@ -219,6 +223,44 @@ export default {
       // 更加规范的写法 t= 或者其他的 键值都可以 t是time的缩写
       this.codeURL =
         process.env.VUE_APP_URL + "/captcha?type=sendsms&t=" + Date.now();
+    },
+    // 提交表单
+    submitForm(formName) {
+      // 等同于this.$refs['loginForm']相当于获取到了Element0ui的表单
+      // this.$refs['loginForm'] 等同于 this.$refs.loginForm
+      // validate这个方法是Element-ui的表单的方法
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.$message.success("验证成功");
+          // 验证正确
+          // 调用接口
+          register({
+            username:this.form.username,
+            passwoed:this.form.passwoed,
+            phone:this.form.phone,
+            email:this.form.email,
+            avatar:this.form.avatar,
+            rcode:this.form.rcode
+          }).then(res=>{
+            if (res.data.code===200) {
+              this.$message.success("恭喜您注册成功")
+              // 关闭对话框
+              this.dialogFormVisible = false
+              // 清空数据
+              this.$refs[formName].resetFields();
+              // 人为清空图片
+              this.imageUrl = '';
+            } else if(res.data.code===201){
+              // 服务器返回的提示信息 弹出来
+              this.$message.error(res.data.message)
+            }
+          })
+        } else {
+          this.$message.error("验证失败");
+          // 验证错误
+          return false;
+        }
+      });
     }
   }
 };
