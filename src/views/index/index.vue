@@ -2,7 +2,7 @@
   <el-container class="my-container">
     <el-header class="my-header">
       <div class="left">
-        <i class="el-icon-s-fold"></i>
+        <i @click="isCollapse = !isCollapse" class="el-icon-s-fold"></i>
         <img src="../../assets/index_logo.png" alt />
         <span>黑马面面</span>
       </div>
@@ -13,15 +13,49 @@
       </div>
     </el-header>
     <el-container>
-      <el-aside width="200px" class="my-aside">Aside</el-aside>
-      <el-main class="my-main">Main</el-main>
+      <!-- 侧边栏 -->
+      <el-aside width="auto" class="my-aside">
+        <!-- 导航菜单 -->
+        <el-menu
+          router
+          :collapse="isCollapse"
+          :default-active="$route.path"
+          class="el-menu-vertical-demo"
+        >
+          <el-menu-item index="/index/chart">
+            <!-- 图标 -->
+            <i class="el-icon-pie-chart"></i>
+            <span slot="title">数据概览</span>
+          </el-menu-item>
+          <el-menu-item index="/index/user">
+            <i class="el-icon-user"></i>
+            <span slot="title">用户列表</span>
+          </el-menu-item>
+          <el-menu-item index="/index/question">
+            <i class="el-icon-edit-outline"></i>
+            <span slot="title">题库列表</span>
+          </el-menu-item>
+          <el-menu-item index="/index/enterprise">
+            <i class="el-icon-office-building"></i>
+            <span slot="title">企业列表</span>
+          </el-menu-item>
+          <el-menu-item index="/index/subject">
+            <i class="el-icon-notebook-2"></i>
+            <span slot="title">学科列表</span>
+          </el-menu-item>
+        </el-menu>
+      </el-aside>
+      <el-main class="my-main">
+        <!-- 路由出口 -->
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
 // 导入接口
-import { info,logout } from "@/api/index.js";
+import { logout } from "@/api/index.js";
 // 导入token函数
 import { removeToken } from "@/utils/token.js";
 export default {
@@ -31,36 +65,40 @@ export default {
       // 用户名
       usernme: "",
       // 用户头像
-      userIcon: ""
+      userIcon: "",
+      // 是否折叠
+      isCollapse: false
     };
   },
-  methods:{
-    logout(){
-      this.$confirm('你确定要离开我们网站','友情提示',{
-        confirmButtonText:'狠心离开',
-        cancelButtonText:'继续看看',
-        type:'success'
-      }).then(()=>{
-        logout().then(res=>{
-          if (res.data.code===200) {
-            // 移出token
-            removeToken()
-            // 登录页
-            this.$router.push("/login")
-          }
-        })
-      }).catch(()=>{
-        // 点击取消
+  methods: {
+    logout() {
+      this.$confirm("你确定要离开我们网站", "友情提示", {
+        confirmButtonText: "狠心离开",
+        cancelButtonText: "继续看看",
+        type: "success"
       })
+        .then(() => {
+          logout().then(res => {
+            if (res.data.code === 200) {
+              // 移出token
+              removeToken();
+              // 登录页
+              this.$router.push("/login");
+            }
+          });
+        })
+        .catch(() => {
+          // 点击取消
+        });
     }
-  },
-  created() {
-    info().then(res => {
-      this.username = res.data.data.username;
-      // 服务器返回的头像地址不完整，需要进行拼接
-      this.userIcon = process.env.VUE_APP_URL + "/" + res.data.data.avatar;
-    });
   }
+  // created() {
+  //   info().then(res => {
+  //     this.username = res.data.data.username;
+  //     // 服务器返回的头像地址不完整，需要进行拼接
+  //     this.userIcon = process.env.VUE_APP_URL + "/" + res.data.data.avatar;
+  //   });
+  // }
 };
 </script>
 
@@ -104,6 +142,11 @@ export default {
   }
   .my-main {
     background: #0094ff;
+  }
+  /* c3中的transition（过渡），需要有开始和结束的值 */
+  .el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 200px;
+    min-height: 400px;
   }
 }
 </style>
