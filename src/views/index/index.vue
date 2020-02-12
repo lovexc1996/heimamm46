@@ -9,7 +9,7 @@
       <div class="right">
         <img :src="userIcon" alt />
         <span class="name">{{username}},您好</span>
-        <el-button type="primary">退出</el-button>
+        <el-button type="primary" @click="logout">退出</el-button>
       </div>
     </el-header>
     <el-container>
@@ -21,7 +21,9 @@
 
 <script>
 // 导入接口
-import { info } from "@/api/index.js";
+import { info,logout } from "@/api/index.js";
+// 导入token函数
+import { removeToken } from "@/utils/token.js";
 export default {
   name: "index",
   data() {
@@ -31,6 +33,26 @@ export default {
       // 用户头像
       userIcon: ""
     };
+  },
+  methods:{
+    logout(){
+      this.$confirm('你确定要离开我们网站','友情提示',{
+        confirmButtonText:'狠心离开',
+        cancelButtonText:'继续看看',
+        type:'success'
+      }).then(()=>{
+        logout().then(res=>{
+          if (res.data.code===200) {
+            // 移出token
+            removeToken()
+            // 登录页
+            this.$router.push("/login")
+          }
+        })
+      }).catch(()=>{
+        // 点击取消
+      })
+    }
   },
   created() {
     info().then(res => {

@@ -19,6 +19,11 @@ const router = new VueRouter({
             // path:"/",
             component:login
         },
+        {
+            path:"/login",
+            // path:"/",
+            component:login
+        },
         // 首页
         {
             path:"/index",
