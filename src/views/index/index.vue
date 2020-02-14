@@ -80,8 +80,12 @@ export default {
         .then(() => {
           logout().then(res => {
             if (res.data.code === 200) {
-              // 移出token
+              // 移除token
               removeToken();
+              // 移除Vuex中的头像
+              this.$store.commit("changIcon","");
+              // 移除Vuex中的名字
+              this.$store.commit("changname","");
               // 登录页
               this.$router.push("/login");
             }

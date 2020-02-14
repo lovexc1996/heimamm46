@@ -41,45 +41,67 @@ const router = new VueRouter({
     routes: [
         // 登录
         {
+            // 重定向
             path: "/",
             // path:"/",
-            component: login
+            redirect: "/login"
         },
         {
             path: "/login",
             // path:"/",
-            component: login
+            component: login,
+            meta: {
+                title: "欢迎您,请登陆"
+            }
         },
         // 首页
         {
             path: "/index",
             component: index,
+            meta: {
+                title: "黑马面面"
+            },
             // 嵌套路由
             children: [
                 {
                     // 路径不需要写 /  被解析为 /index/chart
                     path: 'chart',
-                    component: chart
+                    component: chart,
+                    meta: {
+                        title: "数据浏览"
+                    }
                 },
                 {
                     // 路径不需要写 /  会被解析为 /index/user
                     path: 'user',
-                    component: user
+                    component: user,
+                    meta: {
+                        title: "用户列表"
+                    }
                 },
                 {
                     // 路径不需要写 /  会被解析为 /index/question
                     path: 'question',
-                    component: question
+                    component: question,
+                    meta: {
+                        title: "题库列表"
+                    }
                 },
                 {
                     // 路径不需要写 /  会被解析为 /index/enterprise
                     path: 'enterprise',
-                    component: enterprise
+                    component: enterprise,
+                    meta: {
+                        title: "企业列表"
+                    }
                 },
                 {
                     // 路径不需要写 /  会被解析为 /index/subject
                     path: 'subject',
-                    component: subject
+                    component: subject,
+                    meta: {
+                        title: "学科列表"
+                    }
                 }
             ]
         }
@@ -102,10 +124,9 @@ router.beforeEach((to, from, next) => {
         // 需要判断登录状态
         // token非空
         if (getToken() == undefined) {
-            // 为空
-            // this 不是 vue示例
-            Message.warning('登录状态有误，请检查');
+            Message.warning('请先登录');
             // 返回登录页
+            NProgress.done();
             next('/login');
         } else {
             // token不为空 token正确判断
@@ -118,8 +139,14 @@ router.beforeEach((to, from, next) => {
                     removeToken();
                     // 返回登录页
                     next('/login');
+                    NProgress.done();
                 } else if (res.data.code === 200) {
                     // 获取成功
+                    // 处理用户的信息 用户的名字
+                    const username = res.data.data.username
+                    //处理用户的信息用户的头像
+                    const userIcon = process.env.VUE_APP_URL + "/" + res.data.data.avatar
+                    window.console.log(username, userIcon)
                     // 放走
                     next();
                 }
@@ -132,9 +159,11 @@ router.beforeEach((to, from, next) => {
 });
 // 导航守卫 afterEach 进入完成之后
 // router.afterEach((to,from)=>{
-router.afterEach(() => {
+router.afterEach(to => {
     // 关闭进度条
     NProgress.done();
+    // 修改标题
+    window.document.title = to.meta.title
 });
 // 暴露出去
 export default router
