@@ -139,21 +139,36 @@ export default {
     this.getData()
   },
   methods: {
+    // 清除搜索
+    clearSeach(){
+      // 清空表单
+      this.$refs.formInline.resetFields()
+      // 返回第一页
+      this.index = 1
+      // 重新获取数据
+      this.getData()
+    },
     // 搜索企业
     searchEnterprise(){
       // 调用数据获取逻辑
       this.getData()
     },
     // 获取逻辑
-    getData(){
-      enterpriseList(
+    getData() {
+      enterpriseList({
+        // 页容量
+        limit: this.size,
+        // 页码
+        page: this.index,
         // 把筛选条件合并
         ...this.formInline
-      ).then(res=>{
+      }).then(res => {
         // window.console.log(res)
         // 保存数据
-        this.tableData = res.data.items
-      })
+        this.tableData = res.data.items;
+        // 保存总条数
+        this.total = res.data.pagination.total;
+      });
     }
   },
 };
