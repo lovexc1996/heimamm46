@@ -49,8 +49,8 @@
 import { logout } from "@/api/index.js";
 // 导入 token函数
 import { removeToken } from "@/utils/token.js";
-// 导入路由数据
-import navRoutes from "@/router/childrenRouters.js"
+// 导入路由数组
+import navRoutes from "@/router/childrenRoutes.js";
 export default {
   name: "index",
   data() {
@@ -61,8 +61,8 @@ export default {
       // userIcon: '',
       // 是否折叠
       isCollapse: false,
-      // 保存到data中方便循环
-      navRoutes:navRoutes
+      // 保存到data中 方便一会循环
+      navRoutes: navRoutes
     };
   },
   // 生命周期钩子
