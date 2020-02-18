@@ -4,11 +4,11 @@
       <div class="left">
         <!-- 左侧图标 -->
         <i @click="isCollapse = !isCollapse" class="el-icon-s-fold"></i>
-        <img src="../../assets/index_logo.png" alt="" />
+        <img src="../../assets/index_logo.png" alt />
         <span>黑马面面</span>
       </div>
       <div class="right">
-        <img :src="$store.state.userIcon" alt="" />
+        <img :src="$store.state.userIcon" alt />
         <span class="name">{{ $store.state.username }},您好</span>
         <el-button type="primary" @click="logout">退出</el-button>
       </div>
@@ -17,30 +17,25 @@
       <!-- 侧边栏 -->
       <el-aside width="auto" class="my-aside">
         <!-- 导航菜单 -->
-        <el-menu router :collapse="isCollapse" :default-active="$route.path" class="el-menu-vertical-demo">
-          <el-menu-item index="/index/chart">
-            <!-- 图标 -->
-            <i class="el-icon-pie-chart"></i>
-            <span slot="title">数据概览</span>
-          </el-menu-item>
-          <el-menu-item index="/index/user">
-            <i class="el-icon-user"></i>
-            <span slot="title">用户列表</span>
-          </el-menu-item>
-          <el-menu-item index="/index/question">
-            <i class="el-icon-edit-outline"></i>
-            <span slot="title">题库列表</span>
-          </el-menu-item>
-          <el-menu-item index="/index/enterprise">
-            <i class="el-icon-office-building"></i>
-            <span slot="title">企业列表</span>
-          </el-menu-item>
-          <el-menu-item index="/index/subject">
-            <i class="el-icon-notebook-2"></i>
-            <span slot="title">学科列表</span>
-          </el-menu-item>
-        </el-menu></el-aside
-      >
+        <el-menu
+          router
+          :collapse="isCollapse"
+          :default-active="$route.path"
+          class="el-menu-vertical-demo"
+        >
+          <template v-for="(item, index) in navRoutes">
+            <el-menu-item
+              :key="index"
+              :index="item.meta.fullPath"
+              v-if="item.meta.rules.includes($store.state.role)"
+            >
+              <!-- 图标 -->
+              <i :class="item.meta.icon"></i>
+              <span slot="title">{{ item.meta.title }}</span>
+            </el-menu-item>
+          </template>
+        </el-menu>
+      </el-aside>
       <el-main class="my-main">
         <!-- 路由出口 -->
         <router-view></router-view>
@@ -51,11 +46,13 @@
 
 <script>
 // 导入接口
-import {  logout } from '@/api/index.js';
+import { logout } from "@/api/index.js";
 // 导入 token函数
-import { removeToken } from '@/utils/token.js';
+import { removeToken } from "@/utils/token.js";
+// 导入路由数据
+import navRoutes from "@/router/childrenRouters.js"
 export default {
-  name: 'index',
+  name: "index",
   data() {
     return {
       // 用户名
@@ -63,7 +60,9 @@ export default {
       // 用户头像
       // userIcon: '',
       // 是否折叠
-      isCollapse: false
+      isCollapse: false,
+      // 保存到data中方便循环
+      navRoutes:navRoutes
     };
   },
   // 生命周期钩子
@@ -93,11 +92,11 @@ export default {
   // },
   methods: {
     logout() {
-      this.$confirm('你确定要离开我们网站', '友情提示', {
-        confirmButtonText: '狠心离开',
-        cancelButtonText: '继续看看',
+      this.$confirm("你确定要离开我们网站", "友情提示", {
+        confirmButtonText: "狠心离开",
+        cancelButtonText: "继续看看",
         // type: 'error'
-        type: 'success'
+        type: "success"
       })
         .then(() => {
           // 点击确定
@@ -106,12 +105,12 @@ export default {
             if (res.data.code === 200) {
               // 移除token
               removeToken();
-              // 移除 Vuex中的 头像 
-              this.$store.commit('changeIcon','')
+              // 移除 Vuex中的 头像
+              this.$store.commit("changeIcon", "");
               // 移除 Vuex中的 名字
-              this.$store.commit('changeName','')
+              this.$store.commit("changeName", "");
               // 去登录页
-              this.$router.push('/login');
+              this.$router.push("/login");
             }
           });
         })
