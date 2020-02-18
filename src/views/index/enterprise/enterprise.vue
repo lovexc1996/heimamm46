@@ -75,12 +75,14 @@
         :total="total"
       ></el-pagination>
     </el-card>
+    <!-- 新增对话框 -->
+    <enterpriseAdd ref="enterpriseAdd"></enterpriseAdd>
   </div>
 </template>
 
 <script>
 // 导入接口
-import { enterpriseList } from "@/api/enterprise.js";
+import { enterpriseList,enterpriseRemove } from "@/api/enterprise.js";
 // 导入新增组件
 import enterpriseAdd from "./components/enterpriseAdd.vue";
 export default {
@@ -134,24 +136,71 @@ export default {
   components: {
     enterpriseAdd
   },
-  created(){
+  created() {
     // 获取数据
-    this.getData()
+    this.getData();
   },
   methods: {
-    // 清除搜索
-    clearSeach(){
-      // 清空表单
-      this.$refs.formInline.resetFields()
-      // 返回第一页
-      this.index = 1
+    // 删除数据
+    handleDelete(index, row) {
+      // window.console.log(index,row)
+      // 获取id
+      const id = row.id;
+      // 询问用户
+      this.$confirm("你确定要删除这条数据吗", "友情提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          // 确定
+          enterpriseRemove({
+            id // 或者  id:row.id  或者 id:id
+          }).then(res => {
+            if (res.code === 200) {
+              // 页码异常处理
+              if (this.tableData.length == 1) {
+                // 判断页码
+                if (this.index > 1) {
+                  this.index--;
+                }
+              }
+              // 重新获取数据
+              this.getData();
+            }
+          });
+        })
+        .catch(() => {});
+    },
+    // 页码改变
+    currentChang(newIndex) {
+      // 保存新页码
+      this.index = newIndex;
       // 重新获取数据
-      this.getData()
+      this.getData();
+    },
+    // 页容量改变
+    sizeChange(newSize) {
+      // 保存新页容量
+      this.size = newSize;
+      // 返回第一页
+      this.index = 1;
+      // 重新获取数据
+      this.getData();
+    },
+    // 清除搜索
+    clearSeach() {
+      // 清空表单
+      this.$refs.formInline.resetFields();
+      // 返回第一页
+      this.index = 1;
+      // 重新获取数据
+      this.getData();
     },
     // 搜索企业
-    searchEnterprise(){
+    searchEnterprise() {
       // 调用数据获取逻辑
-      this.getData()
+      this.getData();
     },
     // 获取逻辑
     getData() {
@@ -170,7 +219,7 @@ export default {
         this.total = res.data.pagination.total;
       });
     }
-  },
+  }
 };
 </script>
 
