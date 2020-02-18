@@ -1,6 +1,6 @@
 <template>
-  <el-dialog class="enterprise-add" width="600px" center title="新增企业" :visible.sync="dialogFormVisible">
-    <el-form :model="form" ref="enterpriseAdd" :rules="rules">
+  <el-dialog class="enterprise-add" width="600px" center title="修改企业" :visible.sync="dialogFormVisible">
+    <el-form :model="form" ref="enterpriseEdit" :rules="rules">
       <el-form-item prop="eid" label="企业编号" :label-width="formLabelWidth">
         <el-input v-model="form.eid" autocomplete="off"></el-input>
       </el-form-item>
@@ -19,16 +19,16 @@
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="dialogFormVisible = false">取 消</el-button>
-      <el-button type="primary" @click="submitForm('enterpriseAdd')">确 定</el-button>
+      <el-button type="primary" @click="submitForm('enterpriseEdit')">确 定</el-button>
     </div>
   </el-dialog>
 </template>
 
 <script>
-// 导入企业的新增方法
-import { enterpriseAdd } from '@/api/enterprise.js';
+// 导入企业的修改方法
+import { enterpriseEdit } from '@/api/enterprise.js';
 export default {
-  name: 'enterpriseAdd',
+  name: 'enterpriseEdit',
   data() {
     return {
       // 是否显示对话框
@@ -60,12 +60,12 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          enterpriseAdd(this.form).then(res => {
+          enterpriseEdit(this.form).then(res => {
             // window.console.log(res)
             if (res.code === 201) {
               this.$message.error('企业编号不能重复哦');
             } else if (res.code === 200) {
-              this.$message.success('数据新增成功');
+              this.$message.success('数据修改成功');
               // 关闭对话框
               this.dialogFormVisible = false;
               // 清空表单
