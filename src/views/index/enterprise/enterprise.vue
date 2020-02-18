@@ -82,7 +82,11 @@
 
 <script>
 // 导入接口
-import { enterpriseList,enterpriseRemove } from "@/api/enterprise.js";
+import {
+  enterpriseList,
+  enterpriseRemove,
+  enterpriseStatus
+} from "@/api/enterprise.js";
 // 导入新增组件
 import enterpriseAdd from "./components/enterpriseAdd.vue";
 export default {
@@ -141,6 +145,17 @@ export default {
     this.getData();
   },
   methods: {
+    // 状态切换
+    changeStatus(index,row){
+      enterpriseStatus({
+        id:row.id
+      }).then(res=>{
+        if (res.code===200) {
+          this.$message.success('状态切换成功')
+          this.getData()
+        }
+      })
+    },
     // 删除数据
     handleDelete(index, row) {
       // window.console.log(index,row)
