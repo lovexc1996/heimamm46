@@ -20,10 +20,10 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button @click="searchSubject" type="primary">搜索</el-button>
+          <el-button @click="searchEnterprise" type="primary">搜索</el-button>
           <el-button @click="clearSeach">清除</el-button>
           <el-button
-            @click="$refs.subjectAdd.dialogFormVisible = true"
+            @click="$refs.enterpriseAdd.dialogFormVisible = true"
             icon="el-icon-plus"
             type="primary"
           >新增企业</el-button>
@@ -82,16 +82,16 @@
 // 导入接口
 import { enterpriseList } from "@/api/enterprise.js";
 // 导入新增组件
-import enterpriseAdd from './components/enterpriseAdd.vue'
+import enterpriseAdd from "./components/enterpriseAdd.vue";
 export default {
   name: "enterprise",
   data() {
     return {
       // 顶部表单的数据
       formInline: {
-        // 学科名
+        // 企业名
         name: "",
-        // 学科编号
+        // 企业编号
         rid: "",
         // 状态
         status: "",
@@ -131,14 +131,31 @@ export default {
     };
   },
   // 注册组件
-  components:{
+  components: {
     enterpriseAdd
   },
-  created() {
-    enterpriseList().then(res => {
-      this.tableData = res.data.items;
-    });
-  }
+  created(){
+    // 获取数据
+    this.getData()
+  },
+  methods: {
+    // 搜索企业
+    searchEnterprise(){
+      // 调用数据获取逻辑
+      this.getData()
+    },
+    // 获取逻辑
+    getData(){
+      enterpriseList(
+        // 把筛选条件合并
+        ...this.formInline
+      ).then(res=>{
+        // window.console.log(res)
+        // 保存数据
+        this.tableData = res.data.items
+      })
+    }
+  },
 };
 </script>
 
