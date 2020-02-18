@@ -79,7 +79,10 @@
 </template>
 
 <script>
+// 导入接口
 import { enterpriseList } from "@/api/enterprise.js";
+// 导入新增组件
+import enterpriseAdd from './components/enterpriseAdd.vue'
 export default {
   name: "enterprise",
   data() {
@@ -126,6 +129,10 @@ export default {
       // 总条数
       total: 20
     };
+  },
+  // 注册组件
+  components:{
+    enterpriseAdd
   },
   created() {
     enterpriseList().then(res => {
